@@ -4,8 +4,8 @@
 1. [Prerequisites](#prerequisites)
 2. [Installation](#installation)
 3. [Directory Structure Setup](#directory-structure-setup)
-4. [Service Configuration](#service-configuration)
-5. [Environment Configuration](#environment-configuration)
+4. [Environment Configuration](#environment-configuration)
+5. [Service Configuration](#service-configuration)
 6. [Settings Configuration](#settings-configuration)
 7. [Security Settings](#security-settings)
 8. [Service Management](#service-management)
@@ -51,6 +51,41 @@ Understanding chmod 770:
 - Last 0: Others
   - 0 (no access)
 
+## Environment Configuration
+
+1. Generate required credentials:
+```bash
+# Generate password hash
+node-red-admin hash-pw
+
+# Generate credential secret
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+2. Create .env file:
+```bash
+cat > /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env << 'EOL'
+NODE_RED_USER_DIR=/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered
+NODERED_USER=admin
+NODERED_PASSWORD=$2y$08$yourhashhere
+CREDENTIAL_SECRET=yoursecrethere
+TZ=Europe/Rome
+EOL
+```
+
+3. Set proper permissions:
+```bash
+chmod 600 /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
+```
+
+Understanding chmod 600 for .env:
+- 6 for owner (raspberry-admin)
+  - 4 (read)
+  - 2 (write)
+  - Total: 6
+- 0 for group (no access)
+- 0 for others (no access)
+
 ## Service Configuration
 
 1. Create or edit the Node-RED service file:
@@ -58,7 +93,7 @@ Understanding chmod 770:
 sudo systemctl edit --full nodered.service
 ```
 
-2. Add the following configuration:
+2. Add this configuration:
 ```ini
 [Unit]
 Description=Node-RED
@@ -71,17 +106,12 @@ Type=simple
 User=raspberry-admin
 Group=raspberry-admin
 WorkingDirectory=/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered
-Environment="NODE_RED_USER_DIR=/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered"
-Environment="NODE_RED_ENV_FILE=/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env"
+EnvironmentFile=/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
 ExecStart=/usr/bin/node-red-pi --userDir ${NODE_RED_USER_DIR}
-
-# Enhanced service monitoring
 Restart=on-failure
 RestartSec=10
 StartLimitInterval=200
 StartLimitBurst=5
-
-# Process management
 KillSignal=SIGINT
 TimeoutStartSec=60
 TimeoutStopSec=60
@@ -90,31 +120,10 @@ TimeoutStopSec=60
 WantedBy=multi-user.target
 ```
 
-## Environment Configuration
-
-1. Create .env file:
-```bash
-nano /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
-```
-
-2. Add environment variables:
-```plaintext
-# Node-RED Directory and Configuration
-NODE_RED_USER_DIR='/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered'
-
-# Node-RED Credentials
-NODERED_USER='raspberry-admin'
-NODERED_PASSWORD='your_hashed_password'
-CREDENTIAL_SECRET='your_generated_secret'
-
-# Timezone
-TZ='Europe/Rome'
-```
-
-3. Set .env file permissions:
-```bash
-chmod 600 /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
-```
+Important notes:
+- Using `EnvironmentFile` instead of individual `Environment` settings
+- No need to escape special characters in passwords
+- All environment variables are managed in the .env file
 
 ## Settings Configuration
 
@@ -123,7 +132,7 @@ chmod 600 /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/
 nano /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/settings.js
 ```
 
-2. Add the following configuration:
+2. Add this configuration:
 ```javascript
 module.exports = {
     uiPort: process.env.PORT || 1880,
@@ -171,16 +180,9 @@ chmod 644 /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/
 sudo chown -R raspberry-admin:raspberry-admin /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered
 ```
 
-2. Generate password hash:
+2. Verify file permissions:
 ```bash
-# Using Node-RED command
-node-red-admin hash-pw
-```
-
-3. Generate credential secret:
-```bash
-# Using Node.js
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ls -la /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/
 ```
 
 ## Service Management
@@ -207,64 +209,77 @@ sudo systemctl status nodered
 # Monitor logs
 journalctl -u nodered -f
 
-# Check restart count
-systemctl show nodered --property=NRestarts
+# Check environment variables
+sudo systemctl show nodered -p Environment
 ```
 
-2. Monitor service health:
+2. Verify configuration:
 ```bash
-# Check if process is running
-ps aux | grep node-red
+# Check .env file content
+sudo -u raspberry-admin cat /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
 
-# Check port
-sudo netstat -tulpn | grep 1880
-
-# Check system resources
-top -u raspberry-admin
+# Check service configuration
+sudo systemctl cat nodered
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. Service won't start:
+1. Environment Variables Not Loading:
 ```bash
-# Check logs for errors
-journalctl -u nodered -n 50 --no-pager
-
-# Verify permissions
-ls -la /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered
-
-# Check configuration
-sudo systemctl cat nodered
+# Check .env file format
+cat -A /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
+# Ensure no spaces around = and no quotes around values
 ```
 
-2. Authentication issues:
+2. Permission Issues:
 ```bash
-# Verify .env file
-cat /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
+# Fix .env permissions
+chmod 600 /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
 
-# Check environment variables
-sudo systemctl show nodered -p Environment
-
-# Regenerate password if needed
-node-red-admin hash-pw
-```
-
-3. Directory issues:
-```bash
-# Verify directory exists and has correct permissions
-ls -la /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered
-
-# Fix permissions if needed
-sudo chown -R raspberry-admin:raspberry-admin /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered
+# Fix directory permissions
 chmod 770 /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered
 ```
 
+3. Service Won't Start:
+```bash
+# Check logs
+journalctl -u nodered -n 50 --no-pager
+
+# Verify service file
+sudo systemctl cat nodered
+```
+
 ### Best Practices
-1. Regular backups of flows and configurations
-2. Monitor system logs
-3. Keep Node-RED and system updated
-4. Regular security audits
-5. Document any custom modifications
-6. Test changes in a safe environment first
+1. Always use `EnvironmentFile` in the service configuration
+2. Keep environment variables in .env file without quotes
+3. Maintain strict file permissions
+4. Regular backups of configuration
+5. Monitor logs for issues
+6. Keep system and Node-RED updated
+
+### Recovery Steps
+1. If authentication fails:
+```bash
+# Generate new password
+node-red-admin hash-pw
+
+# Update .env file
+nano /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/.env
+
+# Restart service
+sudo systemctl restart nodered
+```
+
+2. If credentials are corrupted:
+```bash
+# Remove credentials file
+rm /home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/flows_cred.json
+
+# Generate new credential secret
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Update .env and restart
+sudo systemctl restart nodered
+```

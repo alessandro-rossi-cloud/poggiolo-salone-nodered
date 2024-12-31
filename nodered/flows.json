@@ -1,0 +1,808 @@
+[
+    {
+        "id": "f4dc77d5042f6d97",
+        "type": "tab",
+        "label": "React Frontend Monitor",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "energy_flow",
+        "type": "tab",
+        "label": "Energy Metrics",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2801b16c14686530",
+        "type": "tab",
+        "label": "React dashboard websocket",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e0b6d1ae92273180",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "f9ce7cf7a8dda2bf",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "850f79bcbf797a14",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "e0b6d1ae92273180",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6f42adfb3cd6a168",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "10.1.1.9",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "8b43f356764b4f13",
+        "type": "prometheus-metric-config",
+        "name": "energy_voltage",
+        "help": "Voltage measurement in Volts",
+        "labels": "",
+        "mtype": "gauge"
+    },
+    {
+        "id": "0c4103db2e402b33",
+        "type": "prometheus-metric-config",
+        "name": "energy_current",
+        "help": "Current measurement in Amperes",
+        "labels": "",
+        "mtype": "gauge"
+    },
+    {
+        "id": "c892847a599b4f1b",
+        "type": "prometheus-metric-config",
+        "name": "energy_power",
+        "help": "\"Power measurement in Watts",
+        "labels": "",
+        "mtype": "gauge"
+    },
+    {
+        "id": "4068a8d5f1aae207",
+        "type": "prometheus-metric-config",
+        "name": "energy_frequency",
+        "help": "Frequency measurement in Hertz",
+        "labels": "",
+        "mtype": "gauge"
+    },
+    {
+        "id": "6ee97836f17cd34c",
+        "type": "prometheus-metric-config",
+        "name": "energy_total_kwh",
+        "help": "Total energy consumption in kWh",
+        "labels": "",
+        "mtype": "counter"
+    },
+    {
+        "id": "4e97488d34b3b0de",
+        "type": "prometheus-metric-config",
+        "name": "energy_read_error",
+        "help": "Indicates if there was an error reading the values",
+        "labels": "",
+        "mtype": "gauge"
+    },
+    {
+        "id": "e262d3bc9e3637b0",
+        "type": "prometheus-metric-config",
+        "name": "energy_status",
+        "help": "Device status",
+        "labels": "",
+        "mtype": "gauge"
+    },
+    {
+        "id": "ws-server",
+        "type": "websocket-listener",
+        "path": "/ws/frontend",
+        "wholemsg": "false"
+    },
+    {
+        "id": "keepalive-endpoint",
+        "type": "http in",
+        "z": "f4dc77d5042f6d97",
+        "name": "Keepalive Endpoint",
+        "url": "/keepalive",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 120,
+        "wires": [
+            [
+                "process-keepalive"
+            ]
+        ]
+    },
+    {
+        "id": "process-keepalive",
+        "type": "function",
+        "z": "f4dc77d5042f6d97",
+        "name": "Process Keepalive",
+        "func": "const status = msg.payload.status;\nconst ip = msg.payload.ip;\nconst url = msg.payload.url;\n\ncontext.set('lastKeepalive', Date.now());\ncontext.set('kioskStatus', status);\ncontext.set('kioskIP', ip);\ncontext.set('kioskURL', url);\n\nreturn msg;",
+        "outputs": 1,
+        "x": 410,
+        "y": 120,
+        "wires": [
+            [
+                "1f5e8f6c73d66c1b"
+            ]
+        ]
+    },
+    {
+        "id": "check-timeout",
+        "type": "function",
+        "z": "f4dc77d5042f6d97",
+        "name": "Check Timeout",
+        "func": "const lastKeepalive = context.get('lastKeepalive') || 0;\nconst timeout = 120000; // 2 minutes\n\nif (Date.now() - lastKeepalive > timeout) {\n    return { payload: 'Kiosk Not Responding' };\n}\nreturn null;",
+        "outputs": 1,
+        "x": 410,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dashboard-status",
+        "type": "ui_template",
+        "z": "f4dc77d5042f6d97",
+        "group": "850f79bcbf797a14",
+        "name": "Kiosk Status",
+        "order": 1,
+        "width": "",
+        "height": "",
+        "format": "<div class=\"kiosk-status\">\n    <h3>Kiosk Status</h3>\n    <p>Status: {{msg.payload.status}}</p>\n    <p>IP: {{msg.payload.ip}}</p>\n    <p>URL: {{msg.payload.url}}</p>\n    <p>Last Update: {{msg.payload.timestamp}}</p>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 970,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "monitor-keepalive",
+        "type": "interval",
+        "z": "f4dc77d5042f6d97",
+        "name": "Check Keepalive",
+        "interval": "60",
+        "onstart": false,
+        "x": 190,
+        "y": 180,
+        "wires": [
+            [
+                "check-timeout"
+            ]
+        ]
+    },
+    {
+        "id": "1f5e8f6c73d66c1b",
+        "type": "debug",
+        "z": "f4dc77d5042f6d97",
+        "name": "debug Keepalive",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "mqtt_in",
+        "type": "mqtt in",
+        "z": "energy_flow",
+        "name": "Energy Data",
+        "topic": "energia/Energy",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "6f42adfb3cd6a168",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 130,
+        "y": 240,
+        "wires": [
+            [
+                "split_metrics",
+                "fda0292a1a7792af"
+            ]
+        ]
+    },
+    {
+        "id": "split_metrics",
+        "type": "function",
+        "z": "energy_flow",
+        "d": true,
+        "name": "Split Metrics",
+        "func": "// Split into separate messages for each metric with correct format\nreturn [\n    { payload: { val: msg.payload.Tensione } },           // Voltage\n    { payload: { val: parseFloat(msg.payload.Corrente) } }, // Current\n    { payload: { val: msg.payload.Potenza } },              // Power\n    { payload: { val: msg.payload.Hz } },                   // Frequency\n    { payload: { val: msg.payload.kWh_tot } },             // Total Energy\n    { payload: { val: msg.payload.ReadError ? 1 : 0 } },    // Read Error\n    { payload: { val: msg.payload.Status ? 1 : 0 } }        // Status\n];",
+        "outputs": 7,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 240,
+        "wires": [
+            [
+                "a9d23ed6d62e9bbb",
+                "7774e57e4849bd18"
+            ],
+            [
+                "4e3b07021ebd9fca",
+                "66ae99f62d445b89"
+            ],
+            [
+                "4ae07fbfe1e6d359",
+                "15fed9ae5be31405"
+            ],
+            [
+                "ed82ba0a838a6888",
+                "456de32df22791a9"
+            ],
+            [
+                "368370e40c5be325",
+                "f7eb7aa83a2a5070"
+            ],
+            [
+                "31105f375edf90eb",
+                "dd7240110e86378c"
+            ],
+            [
+                "3eae02120b41437c",
+                "535c3806ce2894b3"
+            ]
+        ]
+    },
+    {
+        "id": "7774e57e4849bd18",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "Voltage",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "fda0292a1a7792af",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 440,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "a9d23ed6d62e9bbb",
+        "type": "prometheus-exporter",
+        "z": "energy_flow",
+        "name": "Voltage",
+        "metric": "8b43f356764b4f13",
+        "x": 780,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "4e3b07021ebd9fca",
+        "type": "prometheus-exporter",
+        "z": "energy_flow",
+        "name": "Current",
+        "metric": "0c4103db2e402b33",
+        "x": 780,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "4ae07fbfe1e6d359",
+        "type": "prometheus-exporter",
+        "z": "energy_flow",
+        "name": "Power",
+        "metric": "c892847a599b4f1b",
+        "x": 770,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "ed82ba0a838a6888",
+        "type": "prometheus-exporter",
+        "z": "energy_flow",
+        "name": "Frequency",
+        "metric": "4068a8d5f1aae207",
+        "x": 790,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "368370e40c5be325",
+        "type": "prometheus-exporter",
+        "z": "energy_flow",
+        "name": "Total Energy",
+        "metric": "6ee97836f17cd34c",
+        "x": 790,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "31105f375edf90eb",
+        "type": "prometheus-exporter",
+        "z": "energy_flow",
+        "name": "Read Error",
+        "metric": "4e97488d34b3b0de",
+        "x": 790,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "3eae02120b41437c",
+        "type": "prometheus-exporter",
+        "z": "energy_flow",
+        "name": "Status",
+        "metric": "e262d3bc9e3637b0",
+        "x": 770,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "66ae99f62d445b89",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "Current",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "15fed9ae5be31405",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "Power",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "456de32df22791a9",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "Frequency",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "f7eb7aa83a2a5070",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "Total Energy",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "dd7240110e86378c",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "Read Error",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "535c3806ce2894b3",
+        "type": "debug",
+        "z": "energy_flow",
+        "name": "Status",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "6d01a3354f718961",
+        "type": "websocket in",
+        "z": "2801b16c14686530",
+        "name": "Dashboard WS In",
+        "server": "ws-server",
+        "client": "",
+        "x": 200,
+        "y": 60,
+        "wires": [
+            [
+                "5793708c427d7907",
+                "9baa722d2bf93480"
+            ]
+        ]
+    },
+    {
+        "id": "22435490850a2fea",
+        "type": "websocket out",
+        "z": "2801b16c14686530",
+        "name": "Dashboard WS Out",
+        "server": "ws-server",
+        "client": "",
+        "x": 840,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "5793708c427d7907",
+        "type": "function",
+        "z": "2801b16c14686530",
+        "name": "Message Handler",
+        "func": "// Parse incoming message\nlet parsedMessage;\ntry {\n    parsedMessage = JSON.parse(msg.payload);\n} catch (error) {\n    node.error('Failed to parse message: ' + error.message);\n    return null;\n}\n\nif (parsedMessage.type === 'keepalive') {\n    // Store client info in flow context\n    const clients = flow.get('activeClients') || {};\n    clients[parsedMessage.payload.clientIP] = {\n        lastSeen: Date.now(),\n        connectionHealth: parsedMessage.payload.connectionHealth,\n        timestamp: parsedMessage.payload.timestamp\n    };\n    flow.set('activeClients', clients);\n\n    // Send keepalive response\n    msg.payload = JSON.stringify({\n        type: 'keepalive-response',\n        timestamp: Date.now(),\n        clientIP: parsedMessage.payload.clientIP\n    });\n    return msg;\n}\n\n// ... rest of your switch statement ...",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 60,
+        "wires": [
+            [
+                "22435490850a2fea",
+                "1025e9c0d0942c90"
+            ]
+        ]
+    },
+    {
+        "id": "08b27efb626c04ae",
+        "type": "function",
+        "z": "2801b16c14686530",
+        "name": "Cleanup Inactive Clients",
+        "func": "// Clean up clients that haven't sent keepalive in last minute\nconst clients = flow.get('activeClients') || {};\nconst now = Date.now();\nconst timeout = 60000; // 1 minute timeout\n\nfor (const [clientIP, data] of Object.entries(clients)) {\n    if (now - data.lastSeen > timeout) {\n        delete clients[clientIP];\n    }\n}\n\nflow.set('activeClients', clients);\nreturn null;",
+        "outputs": 1,
+        "x": 520,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9d97fc7f853cb3e4",
+        "type": "inject",
+        "z": "2801b16c14686530",
+        "name": "Cleanup Timer",
+        "repeat": "30",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 220,
+        "y": 120,
+        "wires": [
+            [
+                "08b27efb626c04ae"
+            ]
+        ]
+    },
+    {
+        "id": "9baa722d2bf93480",
+        "type": "debug",
+        "z": "2801b16c14686530",
+        "name": "debug Websocket",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "1025e9c0d0942c90",
+        "type": "debug",
+        "z": "2801b16c14686530",
+        "name": "debug Message",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "6ff3c9a33c9d3e08",
+        "type": "status",
+        "z": "2801b16c14686530",
+        "name": "Dashboard WS In Status",
+        "scope": [
+            "6d01a3354f718961"
+        ],
+        "x": 250,
+        "y": 200,
+        "wires": [
+            [
+                "9638029d05d0d93a"
+            ]
+        ]
+    },
+    {
+        "id": "9638029d05d0d93a",
+        "type": "debug",
+        "z": "2801b16c14686530",
+        "name": "debug WebSocket Status",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "b8badc4e3397c515",
+        "type": "inject",
+        "z": "2801b16c14686530",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"type\":\"test\",\"payload\":{\"clientIP\":\"nodered-test\",\"timestamp\":1735579447915,\"connectionHealth\":{\"messagesSent\":0,\"messagesReceived\":0,\"latency\":0,\"status\":\"connected\"}}}",
+        "payloadType": "json",
+        "x": 690,
+        "y": 20,
+        "wires": [
+            [
+                "22435490850a2fea"
+            ]
+        ]
+    },
+    {
+        "id": "392dc89ef42f0192",
+        "type": "inject",
+        "z": "2801b16c14686530",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"type\":\"lavatrice-update\",\"data\":{\"isActive\":true,\"deviceStatus\":\"7\",\"deviceStatusName\":\"In Progress\",\"remainingTime\":3600,\"programName\":\"Cotton\",\"programID\":\"1\",\"programPhase\":\"2\",\"programPhaseName\":\"Washing\"}}",
+        "payloadType": "json",
+        "x": 410,
+        "y": 320,
+        "wires": [
+            [
+                "22435490850a2fea"
+            ]
+        ]
+    }
+]

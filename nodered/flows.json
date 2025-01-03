@@ -851,7 +851,7 @@
         "type": "debug",
         "z": "2801b16c14686530",
         "name": "debug - Lavatrice Update",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -859,7 +859,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 830,
+        "x": 930,
         "y": 580,
         "wires": []
     },
@@ -889,7 +889,7 @@
         "type": "debug",
         "z": "2801b16c14686530",
         "name": "debug - Asciugatrice Update",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -897,7 +897,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 840,
+        "x": 940,
         "y": 640,
         "wires": []
     },
@@ -997,6 +997,65 @@
         "wires": [
             [
                 "f10f18e842aa2487",
+                "22435490850a2fea"
+            ]
+        ]
+    },
+    {
+        "id": "6b8548c20d90069e",
+        "type": "mqtt in",
+        "z": "2801b16c14686530",
+        "name": "Update Consumo",
+        "topic": "energia/Energy",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "6f42adfb3cd6a168",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 740,
+        "wires": [
+            [
+                "1ea74c67bd17e93b"
+            ]
+        ]
+    },
+    {
+        "id": "fc13d41bc55d851c",
+        "type": "debug",
+        "z": "2801b16c14686530",
+        "name": "debug Consumo",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "1ea74c67bd17e93b",
+        "type": "function",
+        "z": "2801b16c14686530",
+        "name": "Format message and add type",
+        "func": "\n// verifico che esista il valore di consumo e formatto il messaggio\nif (msg.payload.hasOwnProperty('Potenza') && msg.payload.Potenza > 0 )\n{\n    msg.payload = {\n    type: \"energy-update\",\n    data: {\n            power: msg.payload.Potenza,\n            voltage: msg.payload.Tensione,\n            current: parseFloat(msg.payload.Corrente),\n            frequency: msg.payload.Hz\n        }\n    }\n}\nelse\n{\n    // dato non valido\n    msg = null;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 740,
+        "wires": [
+            [
+                "fc13d41bc55d851c",
                 "22435490850a2fea"
             ]
         ]

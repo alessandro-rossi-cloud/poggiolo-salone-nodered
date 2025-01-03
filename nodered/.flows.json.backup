@@ -769,7 +769,7 @@
         "payload": "{\"type\":\"test\",\"payload\":{\"clientIP\":\"nodered-test\",\"timestamp\":1735579447915,\"connectionHealth\":{\"messagesSent\":0,\"messagesReceived\":0,\"latency\":0,\"status\":\"connected\"}}}",
         "payloadType": "json",
         "x": 810,
-        "y": 360,
+        "y": 320,
         "wires": [
             [
                 "22435490850a2fea"
@@ -847,39 +847,11 @@
         ]
     },
     {
-        "id": "8a48eb9074fec0bd",
-        "type": "change",
-        "z": "2801b16c14686530",
-        "name": "Add msg Type",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload.type",
-                "pt": "msg",
-                "to": "lavatrice-update",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 540,
-        "y": 580,
-        "wires": [
-            [
-                "c5bae4c6da52448d",
-                "22435490850a2fea"
-            ]
-        ]
-    },
-    {
         "id": "c5bae4c6da52448d",
         "type": "debug",
         "z": "2801b16c14686530",
         "name": "debug - Lavatrice Update",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -887,7 +859,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 830,
+        "x": 930,
         "y": 580,
         "wires": []
     },
@@ -895,7 +867,6 @@
         "id": "b993f788380740fa",
         "type": "mqtt in",
         "z": "2801b16c14686530",
-        "d": true,
         "name": "Update Asciugatrice",
         "topic": "miele/tumble_dryer",
         "qos": "0",
@@ -909,35 +880,7 @@
         "y": 640,
         "wires": [
             [
-                "f36175ce4a0bec98"
-            ]
-        ]
-    },
-    {
-        "id": "8d11932a78ac3160",
-        "type": "change",
-        "z": "2801b16c14686530",
-        "name": "Add msg Type",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload.type",
-                "pt": "msg",
-                "to": "asciugatrice-update",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 540,
-        "y": 640,
-        "wires": [
-            [
-                "22435490850a2fea",
-                "f10f18e842aa2487"
+                "546325bb8c178ee4"
             ]
         ]
     },
@@ -946,7 +889,7 @@
         "type": "debug",
         "z": "2801b16c14686530",
         "name": "debug - Asciugatrice Update",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -954,34 +897,9 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 840,
+        "x": 940,
         "y": 640,
         "wires": []
-    },
-    {
-        "id": "f36175ce4a0bec98",
-        "type": "delay",
-        "z": "2801b16c14686530",
-        "name": "",
-        "pauseType": "delay",
-        "timeout": "1",
-        "timeoutUnits": "seconds",
-        "rate": "1",
-        "nbRateUnits": "1",
-        "rateUnits": "second",
-        "randomFirst": "1",
-        "randomLast": "5",
-        "randomUnits": "seconds",
-        "drop": false,
-        "allowrate": false,
-        "outputs": 1,
-        "x": 360,
-        "y": 640,
-        "wires": [
-            [
-                "8d11932a78ac3160"
-            ]
-        ]
     },
     {
         "id": "26cc8cf7e016dcf7",
@@ -1033,29 +951,13 @@
         "topic": "",
         "payload": "{\"type\":\"lavatrice-update\",\"data\":{\"isActive\":false,\"deviceStatus\":\"1\",\"deviceStatusName\":\"Off\",\"remainingTime\":0,\"programName\":\"---\",\"programID\":\"0\",\"programPhase\":\"0\",\"programPhaseName\":\"---\",\"isOffline\":false,\"error\":null}}",
         "payloadType": "json",
-        "x": 840,
-        "y": 300,
+        "x": 860,
+        "y": 280,
         "wires": [
             [
                 "22435490850a2fea"
             ]
         ]
-    },
-    {
-        "id": "69a28be9d5e63322",
-        "type": "debug",
-        "z": "2801b16c14686530",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 520,
-        "y": 520,
-        "wires": []
     },
     {
         "id": "0424ced3fb5c95c2",
@@ -1069,11 +971,92 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 560,
+        "x": 470,
+        "y": 580,
         "wires": [
             [
-                "69a28be9d5e63322"
+                "c5bae4c6da52448d",
+                "22435490850a2fea"
+            ]
+        ]
+    },
+    {
+        "id": "546325bb8c178ee4",
+        "type": "function",
+        "z": "2801b16c14686530",
+        "name": "Format message and add type",
+        "func": "msg.payload = {\n    type: \"asciugatrice-update\",\n    data: msg.payload\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 640,
+        "wires": [
+            [
+                "f10f18e842aa2487",
+                "22435490850a2fea"
+            ]
+        ]
+    },
+    {
+        "id": "6b8548c20d90069e",
+        "type": "mqtt in",
+        "z": "2801b16c14686530",
+        "name": "Update Consumo",
+        "topic": "energia/Energy",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "6f42adfb3cd6a168",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 740,
+        "wires": [
+            [
+                "1ea74c67bd17e93b"
+            ]
+        ]
+    },
+    {
+        "id": "fc13d41bc55d851c",
+        "type": "debug",
+        "z": "2801b16c14686530",
+        "name": "debug Consumo",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "1ea74c67bd17e93b",
+        "type": "function",
+        "z": "2801b16c14686530",
+        "name": "Format message and add type",
+        "func": "\n// verifico che esista il valore di consumo e formatto il messaggio\nif (msg.payload.hasOwnProperty('Potenza') && msg.payload.Potenza > 0 )\n{\n    msg.payload = {\n    type: \"energy-update\",\n    data: {\n            power: msg.payload.Potenza,\n            voltage: msg.payload.Tensione,\n            current: msg.payload.Corrente,\n            frequency: msg.payload.Hz\n        }\n    }\n}\nelse\n{\n    // dato non valido\n    msg = null;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 740,
+        "wires": [
+            [
+                "fc13d41bc55d851c",
+                "22435490850a2fea"
             ]
         ]
     }

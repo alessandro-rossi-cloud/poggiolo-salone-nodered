@@ -18,6 +18,8 @@
         },
         "debug": {
             "filter": "filterCurrent"
-        }
+        },
+        "menu-deploymenu-item-flow": true,
+        "menu-deploymenu-item-full": false
     }
 }

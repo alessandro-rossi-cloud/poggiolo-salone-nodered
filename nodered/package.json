@@ -6,6 +6,7 @@
     "dependencies": {
         "node-red-contrib-interval": "~0.0.1",
         "node-red-contrib-prometheus-exporter": "~1.0.5",
-        "node-red-dashboard": "~3.6.5"
+        "node-red-dashboard": "~3.6.5",
+        "node-red-node-pi-gpio": "~2.0.6"
     }
 }

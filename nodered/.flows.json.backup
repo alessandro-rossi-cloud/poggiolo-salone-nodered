@@ -23,6 +23,21 @@
         "env": []
     },
     {
+        "id": "touch_display_flow",
+        "type": "tab",
+        "label": "LCD Display Control",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "7ee46d7bdcc0e961",
+        "type": "tab",
+        "label": "Allarme",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "e0b6d1ae92273180",
         "type": "ui_tab",
         "name": "Home",
@@ -290,8 +305,8 @@
         "resendOnRefresh": false,
         "templateScope": "local",
         "className": "",
-        "x": 970,
-        "y": 120,
+        "x": 370,
+        "y": 280,
         "wires": [
             []
         ]
@@ -1044,7 +1059,7 @@
         "type": "function",
         "z": "2801b16c14686530",
         "name": "Format message and add type",
-        "func": "\n// verifico che esista il valore di consumo e formatto il messaggio\nif (msg.payload.hasOwnProperty('Potenza') && msg.payload.Potenza > 0 )\n{\n    msg.payload = {\n    type: \"energy-update\",\n    data: {\n            power: msg.payload.Potenza,\n            voltage: msg.payload.Tensione,\n            current: msg.payload.Corrente,\n            frequency: msg.payload.Hz\n        }\n    }\n}\nelse\n{\n    // dato non valido\n    msg = null;\n}\n\nreturn msg;",
+        "func": "\n// verifico che esista il valore di consumo e formatto il messaggio\nif (msg.payload.hasOwnProperty('Potenza') && msg.payload.Potenza > 0 )\n{\n    msg.payload = {\n    type: \"energy-update\",\n    data: {\n            power: msg.payload.Potenza,\n            voltage: msg.payload.Tensione,\n            current: parseFloat(msg.payload.Corrente),\n            frequency: msg.payload.Hz\n        }\n    }\n}\nelse\n{\n    // dato non valido\n    msg = null;\n}\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1059,5 +1074,504 @@
                 "22435490850a2fea"
             ]
         ]
+    },
+    {
+        "id": "touch_monitor",
+        "type": "function",
+        "z": "touch_display_flow",
+        "name": "Monitor Touch Events",
+        "func": "// Process handling\nlet touchProcess = context.get('touchProcess');\nif (touchProcess) {\n    touchProcess.kill();\n}\n\n// Start monitoring touch events\nconst process = childProcess.spawn('sudo', ['evtest', '/dev/input/event3']);\ncontext.set('touchProcess', process);\n\n// Buffer to store partial data\nlet buffer = '';\n\nprocess.stdout.on('data', (data) => {\n    // Append new data to buffer\n    buffer += data.toString();\n    \n    // Process complete lines\n    let lines = buffer.split('\\n');\n    buffer = lines.pop(); // Keep the last incomplete line in buffer\n    \n    for (let line of lines) {\n        // Look specifically for touch press event\n        if (line.includes('type 1 (EV_KEY), code 330 (BTN_TOUCH), value 1')) {\n            // Debounce the touch detection\n            const now = Date.now();\n            const lastTouch = context.get('lastTouch') || 0;\n            if (now - lastTouch > 1000) { // 1 second debounce\n                context.set('lastTouch', now);\n                node.warn('Touch press detected');\n                node.send({ payload: 'check_and_turn_on' });\n            }\n        }\n    }\n});\n\nprocess.stderr.on('data', (data) => {\n    node.error('Error from evtest: ' + data.toString());\n});\n\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Initialize display state as on\nflow.set('displayPowerState', 'on');",
+        "finalize": "// Clean up the process when node is stopped\nconst touchProcess = context.get('touchProcess');\nif (touchProcess) {\n    touchProcess.kill();\n}",
+        "libs": [
+            {
+                "var": "childProcess",
+                "module": "child_process"
+            }
+        ],
+        "x": 370,
+        "y": 460,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "check_and_control",
+        "type": "function",
+        "z": "touch_display_flow",
+        "name": "Check and Control Display",
+        "func": "const envSetup = 'export WAYLAND_DISPLAY=/run/user/1000/wayland-0 && ';\n\n// Function to update state and return message\nfunction updateState(state, action) {\n    flow.set('displayPowerState', state);\n    return {\n        payload: {\n            status: 'success',\n            action: action,\n            displayState: state,\n            timestamp: new Date().toISOString()\n        }\n    };\n}\n\n// Handle status check request\nif (msg.payload === 'status') {\n    return updateState(flow.get('displayPowerState') || 'unknown', 'status_check');\n}\n\n// Handle display off request\nif (msg.payload === 'off') {\n    try {\n        childProcess.execSync(envSetup + 'wlopm --off HDMI-A-2');\n        return updateState('off', 'turned_off');\n    } catch(err) {\n        node.error('Error turning display off: ' + err.message);\n        return null;\n    }\n}\n\n// Handle display on request or touch activation\nif (msg.payload === 'on' || msg.payload === 'check_and_turn_on') {\n    const currentState = flow.get('displayPowerState');\n    \n    if (currentState === 'off' || msg.payload === 'on') {\n        try {\n            childProcess.execSync(envSetup + 'wlopm --on HDMI-A-2');\n            return updateState('on', 'turned_on');\n        } catch(err) {\n            node.error('Error turning display on: ' + err.message);\n            return null;\n        }\n    } else {\n        node.warn('Display is already on - no action needed');\n        return null;\n    }\n}\n\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "childProcess",
+                "module": "child_process"
+            }
+        ],
+        "x": 1060,
+        "y": 520,
+        "wires": [
+            [
+                "debug1"
+            ]
+        ]
+    },
+    {
+        "id": "start_touch_monitor",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Start Touch Monitor",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.5",
+        "topic": "",
+        "payload": "start",
+        "payloadType": "str",
+        "x": 130,
+        "y": 460,
+        "wires": [
+            [
+                "touch_monitor"
+            ]
+        ]
+    },
+    {
+        "id": "debug1",
+        "type": "debug",
+        "z": "touch_display_flow",
+        "name": "Debug Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1320,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "turn_off",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Turn OFF Display",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "off",
+        "payloadType": "str",
+        "x": 330,
+        "y": 520,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "turn_on",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Turn ON Display",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "on",
+        "payloadType": "str",
+        "x": 330,
+        "y": 560,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "check_status",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Check Status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "status",
+        "payloadType": "str",
+        "x": 330,
+        "y": 600,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "a2afae48780c4b75",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Daily - Turn Display ON - Working days",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "20 05 * * 1,2,3,4,5",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "on",
+        "payloadType": "str",
+        "x": 300,
+        "y": 160,
+        "wires": [
+            [
+                "27919a1dbac2069f"
+            ]
+        ]
+    },
+    {
+        "id": "ed25d69b3bb58b53",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Daily - Turn Display ON - Weekend",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 08 * * 6,0",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "on",
+        "payloadType": "str",
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "27919a1dbac2069f"
+            ]
+        ]
+    },
+    {
+        "id": "64f9a4a9ce58ba12",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Daily - Turn Display OFF",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "30 23 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "off",
+        "payloadType": "str",
+        "x": 360,
+        "y": 420,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "27919a1dbac2069f",
+        "type": "function",
+        "z": "touch_display_flow",
+        "name": "Disable ON when Alarm is ON",
+        "func": "if (global.get('allarme-inserito') === false) {\n    return msg;  // passes the message through\n} else {\n    return null; // blocks the message\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 120,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "82accd4380999532",
+        "type": "comment",
+        "z": "touch_display_flow",
+        "name": "Accensione ad orario",
+        "info": "",
+        "x": 260,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "d50907f4e399ef18",
+        "type": "comment",
+        "z": "touch_display_flow",
+        "name": "Spegnimento con inserimento allarme",
+        "info": "",
+        "x": 310,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "a8fed88d60fd4e56",
+        "type": "change",
+        "z": "touch_display_flow",
+        "name": "Set payload off",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760,
+        "y": 220,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "6866a931891d358d",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Test Allarme Inserito",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 230,
+        "y": 280,
+        "wires": [
+            [
+                "8ece74e1f02cddca"
+            ]
+        ]
+    },
+    {
+        "id": "159c9511274c8b70",
+        "type": "link in",
+        "z": "touch_display_flow",
+        "name": "link in 1",
+        "links": [
+            "7066d6ba53c0d642"
+        ],
+        "x": 125,
+        "y": 240,
+        "wires": [
+            [
+                "8ece74e1f02cddca"
+            ]
+        ]
+    },
+    {
+        "id": "bb41902ae59f2692",
+        "type": "inject",
+        "z": "touch_display_flow",
+        "name": "Test Allarme Disinserito",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 220,
+        "y": 320,
+        "wires": [
+            [
+                "8ece74e1f02cddca"
+            ]
+        ]
+    },
+    {
+        "id": "8ece74e1f02cddca",
+        "type": "switch",
+        "z": "touch_display_flow",
+        "name": "Check Inserito o Disinserito",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 500,
+        "y": 240,
+        "wires": [
+            [
+                "a8fed88d60fd4e56"
+            ],
+            [
+                "a8133b0ce822f994"
+            ]
+        ]
+    },
+    {
+        "id": "a8133b0ce822f994",
+        "type": "change",
+        "z": "touch_display_flow",
+        "name": "Set payload on",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "on",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760,
+        "y": 260,
+        "wires": [
+            [
+                "check_and_control"
+            ]
+        ]
+    },
+    {
+        "id": "476612f08cf215cf",
+        "type": "mqtt in",
+        "z": "7ee46d7bdcc0e961",
+        "name": "Allarme Inserito",
+        "topic": "allarme/Allarme-Inserito",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "6f42adfb3cd6a168",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 320,
+        "wires": [
+            [
+                "65ec45ac545aaf90"
+            ]
+        ]
+    },
+    {
+        "id": "367d0f5f00b2c9ed",
+        "type": "debug",
+        "z": "7ee46d7bdcc0e961",
+        "name": "debug Allarme Inserito",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "65ec45ac545aaf90",
+        "type": "function",
+        "z": "7ee46d7bdcc0e961",
+        "name": "Registra variabile globale allarme-inserito",
+        "func": "// Imposto la variabile globale con lo stato dell'allarme\nglobal.set ('allarme-inserito', msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 320,
+        "wires": [
+            [
+                "367d0f5f00b2c9ed",
+                "7066d6ba53c0d642"
+            ]
+        ]
+    },
+    {
+        "id": "7066d6ba53c0d642",
+        "type": "link out",
+        "z": "7ee46d7bdcc0e961",
+        "name": "Allarme-Inserito",
+        "mode": "link",
+        "links": [
+            "159c9511274c8b70"
+        ],
+        "x": 705,
+        "y": 260,
+        "wires": []
     }
 ]

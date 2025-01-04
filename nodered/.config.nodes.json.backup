@@ -684,5 +684,35 @@
                 "file": "/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/node_modules/node-red-contrib-interval/interval/interval.js"
             }
         }
+    },
+    "node-red-contrib-prometheus-exporter": {
+        "name": "node-red-contrib-prometheus-exporter",
+        "version": "1.0.5",
+        "local": true,
+        "user": true,
+        "nodes": {
+            "prometheus-exporter": {
+                "name": "prometheus-exporter",
+                "types": [
+                    "prometheus-exporter"
+                ],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-contrib-prometheus-exporter",
+                "file": "/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/node_modules/node-red-contrib-prometheus-exporter/prometheus-exporter/prometheus-exporter.js"
+            },
+            "prometheus-metric-config": {
+                "name": "prometheus-metric-config",
+                "types": [
+                    "prometheus-metric-config"
+                ],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-contrib-prometheus-exporter",
+                "file": "/home/raspberry-admin/poggiolo-salone/poggiolo-salone-nodered/nodered/node_modules/node-red-contrib-prometheus-exporter/prometheus-exporter/prometheus-metric-config.js"
+            }
+        }
     }
 }

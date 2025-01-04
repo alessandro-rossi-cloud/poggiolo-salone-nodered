@@ -20,6 +20,7 @@
             "filter": "filterCurrent"
         },
         "menu-deploymenu-item-flow": true,
-        "menu-deploymenu-item-full": false
+        "menu-deploymenu-item-full": false,
+        "menu-deploymenu-item-node": false
     }
 }
